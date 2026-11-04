@@ -24,9 +24,25 @@ tags:
 
 ## 环境要求
 
-1. Windows + Edge 或 Chrome 浏览器(自动探测常见安装路径, 也可用环境变量 `REWARDS_EDGE` 指定浏览器可执行文件; 两者同为 Chromium 内核, 启动参数与无头模式通用)
-2. Node.js >= 22(依赖原生 fetch 和 WebSocket)
+1. Windows 或 macOS, 已安装 Edge 或 Chrome(自动探测常见安装路径, 也可用环境变量 `REWARDS_EDGE` 指定浏览器可执行文件; 两者同为 Chromium 内核, 启动参数与无头模式通用)
+2. Node.js >= 22(依赖原生 fetch 和 WebSocket; macOS 可用 `brew install node`)
 3. 用户已拥有**微软账号**(Microsoft Rewards 是微软的积分体系, 谷歌账号无法登录)
+
+## macOS 使用说明
+
+脚本逻辑跨平台, macOS 上无需改动即可运行, 差异仅在浏览器安装:
+
+```bash
+# 安装浏览器(任选其一, 系统未预装时)
+brew install --cask microsoft-edge
+brew install --cask google-chrome
+
+# 之后命令与 Windows 完全一致
+node scripts/rewards_search.mjs login    # 首次登录
+node scripts/rewards_search.mjs run      # 每日打卡
+```
+
+macOS 浏览器可执行文件位置: `/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge` 或 `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`, 脚本会自动探测。若安装在非标准位置, 用 `REWARDS_EDGE` 指定完整路径。
 
 ## 首次使用流程
 

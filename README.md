@@ -13,8 +13,8 @@
 
 ## 环境要求
 
-- Windows + Edge 或 Chrome（自动探测，也可用 `REWARDS_EDGE` 指定）
-- Node.js >= 22
+- **Windows 或 macOS**，已安装 Edge 或 Chrome（自动探测，也可用 `REWARDS_EDGE` 指定）
+- Node.js >= 22（macOS: `brew install node`）
 - **微软账号**（Microsoft Rewards 属微软积分体系，谷歌账号无法登录）
 
 ## 快速开始
@@ -29,6 +29,18 @@ node scripts/rewards_search.mjs status
 # 3. 正式打卡（无头静默，搜索直到当日积分完成）
 node scripts/rewards_search.mjs run
 ```
+
+## macOS 使用
+
+脚本仅用 Node 原生 API，无平台专有调用，macOS 上命令与 Windows 完全一致，只需先装浏览器：
+
+```bash
+brew install --cask microsoft-edge   # 或 google-chrome
+node scripts/rewards_search.mjs login
+node scripts/rewards_search.mjs run
+```
+
+自动探测路径：`/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge`、`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`。装在非标准位置时用 `REWARDS_EDGE` 指定完整路径。定时打卡可用 crontab 或 WorkBuddy 定时任务。
 
 ## 子命令
 

@@ -22,14 +22,21 @@ import { setTimeout as sleep } from "node:timers/promises";
 const BASE_DIR = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.REWARDS_PORT || 9333);
 
-// 浏览器路径探测: 环境变量 > Edge 常见安装位置 > Chrome 常见安装位置(Chromium 内核参数通用)
+// 浏览器路径探测: 环境变量 > Windows Edge/Chrome > macOS Edge/Chrome (Chromium 内核参数通用)
+const HOME = process.env.HOME || process.env.USERPROFILE || "";
 const EDGE_CANDIDATES = [
   process.env.REWARDS_EDGE,
+  // Windows
   "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
   "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
-  process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe",
+  process.env.LOCALAPPDATA ? `${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe` : null,
+  // macOS
+  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  HOME ? `${HOME}/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge` : null,
+  HOME ? `${HOME}/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` : null,
 ].filter(Boolean);
 const EDGE = EDGE_CANDIDATES.find(p => existsSync(p));
 
@@ -132,7 +139,7 @@ async function evalJs(cdp, sessionId, expression) {
 
 // ---------- Edge 启动 ----------
 function launchEdge(extraArgs = []) {
-  if (!EDGE) throw new Error("未找到 Edge 浏览器, 可用环境变量 REWARDS_EDGE 指定 msedge.exe 路径");
+  if (!EDGE) throw new Error("未找到 Edge/Chrome 浏览器, 可用环境变量 REWARDS_EDGE 指定浏览器可执行文件路径");
   const child = spawn(EDGE, [
     "--user-data-dir=" + PROFILE,
     `--remote-debugging-port=${PORT}`,
@@ -305,7 +312,7 @@ try {
   if (/未登录|非 JSON|无 dashboard/.test(e.message))
     console.error("提示: 可能未登录或 cookie 过期。先运行 node rewards_search.mjs login 重新登录, 再重试");
   else
-    console.error("提示: 检查 Edge 是否已安装, 或用环境变量 REWARDS_EDGE 指定 msedge.exe 路径");
+    console.error("提示: 检查浏览器是否已安装, 或用环境变量 REWARDS_EDGE 指定浏览器可执行文件路径");
   process.exit(1);
 } finally {
   try { await cdp.send("Target.closeTarget", { targetId: page.targetId }); } catch {}

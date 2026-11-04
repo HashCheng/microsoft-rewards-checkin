@@ -5,7 +5,7 @@
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `REWARDS_PROFILE` | `<skill目录>/.edge-rewards-profile` | Edge 专用配置目录, 存放登录 cookie。与日常浏览器完全隔离, 删除该目录等于登出 |
-| `REWARDS_EDGE` | 自动探测 | 浏览器可执行文件完整路径。探测顺序: Edge(x86/x64) → Chrome(x64/x86/用户目录)。Edge 与 Chrome 均可(Chromium 内核参数通用), 但登录用的必须是微软账号 |
+| `REWARDS_EDGE` | 自动探测 | 浏览器可执行文件完整路径。探测顺序: 环境变量 → Windows Edge/Chrome → macOS `/Applications` 下 Edge/Chrome。两个平台均支持, 但登录用的必须是微软账号 |
 | `REWARDS_PORT` | `9333` | CDP 远程调试端口。若与其他工具冲突可换 |
 | `REWARDS_INTERVAL` | `30` | 每次搜索间隔秒数。可被 `run` 子命令的数字参数覆盖, 如 `run 45` |
 | `REWARDS_HEADLESS` | `1` | 是否无头静默运行。默认 `1` 不弹窗; 设为 `0` 显示浏览器窗口(便于观察调试)。`login` 模式始终显示窗口 |
@@ -45,6 +45,20 @@ node rewards_search.mjs test <次数>    # 试跑 N 次搜索不计积分, 验�
 ```
 
 在 WorkBuddy 中建议直接创建每日定时任务(如凌晨 2 点), prompt 只写命令与汇报要求, 不要写死 Node 完整路径。
+
+## 跨平台说明
+
+脚本仅使用 Node 原生能力(`child_process` / `fetch` / `WebSocket`), 无平台专有 API, Windows 与 macOS 行为一致:
+
+| 项目 | Windows | macOS |
+|------|---------|-------|
+| 浏览器探测 | `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe` 等 | `/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge` 等 |
+| 默认 profile | `<skill目录>\.edge-rewards-profile` | `<skill目录>/.edge-rewards-profile` |
+| 无头参数 | `--headless=new` | `--headless=new` |
+| 定时任务 | Windows 计划任务 / WorkBuddy 定时任务 | crontab / launchd / WorkBuddy 定时任务 |
+| 首次登录 | `node rewards_search.mjs login` | 同左 |
+
+Linux 亦可运行(探测路径需用 `REWARDS_EDGE` 手动指定 chrome/chromium 路径)。
 
 ## 隐私与安全说明
 
